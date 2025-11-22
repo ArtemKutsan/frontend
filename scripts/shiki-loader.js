@@ -1,4 +1,4 @@
-import { highlightPreBlocks } from "./scripts/shiki-pre.js";
+import { highlightPreBlocks } from "./shiki-pre.js";
 
 const theme = document
   .querySelector("html")

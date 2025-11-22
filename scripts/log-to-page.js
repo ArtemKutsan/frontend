@@ -1,5 +1,5 @@
 // scripts/log-to-page.js
-// import { highlightPreBlocks } from "./scripts/shiki-pre.js";
+// import { highlightPreBlocks } from "./shiki-pre.js";
 
 const formatHTML = (el, depth = 0) => {
   const indent = "  ".repeat(depth);

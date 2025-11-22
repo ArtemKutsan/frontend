@@ -145,6 +145,8 @@ header {
 /* ===== Меню ====== */
 .dropdown {
   position: relative;
+  background: var(--color-bg);
+
 }
 
 .dropdown > button {

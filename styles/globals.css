@@ -43,7 +43,7 @@
 
   --color-elevated: #fafafa;
 
-  --color-highlight: #ffffff4f;
+  --color-highlight: #f5f5f5;
 
   --color-bg-inverse: var(--color-accent);
   --color-text-inverse: var(--color-light);
@@ -70,7 +70,7 @@
 
   --color-elevated: #1a1a1a;
 
-  --color-highlight: #ffffff0f;
+  --color-highlight: #303030;
 
   --color-bg-inverse: var(--color-accent);
   --color-text-inverse: var(--color-dark);
@@ -165,7 +165,7 @@ header {
 
   border-radius: 1rem;
 
-  background: var(--color-bg);
+  background: var(--color-highlight);
   padding: 0.5rem 1rem;
   z-index: 10;
   overflow: hidden;

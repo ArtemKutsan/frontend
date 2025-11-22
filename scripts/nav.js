@@ -55,6 +55,14 @@ const generateNavItems = () => {
         type: "menu",
         items: [
           {
+            text: "Login/Register",
+            title: "Open Authorization",
+            href: "auth.html",
+            type: "link",
+            class: "mx-1",
+            icon: "",
+          },
+          {
             text: "Todo.App",
             title: "Open Todo.App",
             href: "app-todo.html",
@@ -63,9 +71,9 @@ const generateNavItems = () => {
             icon: "",
           },
           {
-            text: "Login/Register",
-            title: "Open Authorization",
-            href: "auth.html",
+            text: "CorpTodoViewer.App",
+            title: "Open CorpTodoViewer.App",
+            href: "app-corp-todo-viewer.html",
             type: "link",
             class: "mx-1",
             icon: "",
@@ -128,6 +136,14 @@ const generateNavItems = () => {
         type: "menu",
         items: [
           {
+            text: "Login/Register",
+            title: "Open Authorization",
+            href: "auth.html",
+            type: "link",
+            class: "mx-1",
+            icon: "",
+          },
+          {
             text: "Todo.App",
             title: "Open Todo.App",
             href: "app-todo.html",
@@ -136,9 +152,9 @@ const generateNavItems = () => {
             icon: "",
           },
           {
-            text: "Login/Register",
-            title: "Open Authorization",
-            href: "auth.html",
+            text: "CorpTodoViewer.App",
+            title: "Open CorpTodoViewer.App",
+            href: "app-corp-todo-viewer.html",
             type: "link",
             class: "mx-1",
             icon: "",

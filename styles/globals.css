@@ -165,11 +165,11 @@ header {
 
   border-radius: 1rem;
 
-  background: var(--color-highlight);
+  background: var(--color-bg);
   padding: 0.5rem 1rem;
   z-index: 10;
   overflow: hidden;
-  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.075);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.125);
 }
 
 .dropdown-content li {
@@ -181,10 +181,6 @@ header {
   padding: 0.5rem 0;
   white-space: nowrap;
 }
-
-/* .dropdown-content li a:hover {
-  background: #eee;
-} */
 
 .dropdown:hover .dropdown-content,
 .dropdown:focus-within .dropdown-content {

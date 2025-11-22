@@ -13,7 +13,7 @@ const generateNavItems = () => {
       {
         text: "Home",
         title: "Go to Home page",
-        href: "/index.html",
+        href: "index.html",
         type: "link",
         class: "mx-1",
         icon: "",
@@ -21,7 +21,7 @@ const generateNavItems = () => {
       {
         text: "Lesson",
         title: "Go to Lesson page",
-        href: "/lesson.html",
+        href: "lesson.html",
         type: "link",
         class: "mx-1",
         icon: "",
@@ -29,7 +29,7 @@ const generateNavItems = () => {
       {
         text: "Practice",
         title: "Go to Practice page",
-        href: "/practice.html",
+        href: "practice.html",
         type: "link",
         class: "mx-1",
         icon: "",
@@ -37,7 +37,7 @@ const generateNavItems = () => {
       {
         text: "Homework",
         title: "Go to Homework page",
-        href: "/homework-15.html",
+        href: "homework-15.html",
         type: "link",
         class: "mx-1",
         icon: "",
@@ -57,7 +57,7 @@ const generateNavItems = () => {
           {
             text: "Todo.App",
             title: "Open Todo.App",
-            href: "/app-todo.html",
+            href: "app-todo.html",
             type: "link",
             class: "mx-1",
             icon: "",
@@ -65,7 +65,7 @@ const generateNavItems = () => {
           {
             text: "Login/Register",
             title: "Open Authorization",
-            href: "/auth.html",
+            href: "auth.html",
             type: "link",
             class: "mx-1",
             icon: "",
@@ -75,7 +75,7 @@ const generateNavItems = () => {
       {
         text: "",
         title: "Open Profile",
-        href: "/profile.html",
+        href: "profile.html",
         type: "link",
         class: "btn btn-ghost",
         icon: '<i class="bi bi-person-fill text-lg"></i>',
@@ -93,7 +93,7 @@ const generateNavItems = () => {
       {
         text: "Home",
         title: "Go to Home page",
-        href: "/index.html",
+        href: "index.html",
         type: "link",
         class: "mx-1",
         icon: "",
@@ -102,7 +102,7 @@ const generateNavItems = () => {
       {
         text: "Lesson",
         title: "Go to Lesson page",
-        href: "/lesson.html",
+        href: "lesson.html",
         type: "link",
         class: "mx-1",
         icon: "",
@@ -110,7 +110,7 @@ const generateNavItems = () => {
       {
         text: "Practice",
         title: "Go to Practice page",
-        href: "/practice.html",
+        href: "practice.html",
         type: "link",
         class: "mx-1",
         icon: "",
@@ -118,7 +118,7 @@ const generateNavItems = () => {
       {
         text: "Homework",
         title: "Go to Homework page",
-        href: "/homework-15.html",
+        href: "homework-15.html",
         type: "link",
         class: "mx-1",
         icon: "",
@@ -130,7 +130,7 @@ const generateNavItems = () => {
           {
             text: "Todo.App",
             title: "Open Todo.App",
-            href: "/app-todo.html",
+            href: "app-todo.html",
             type: "link",
             class: "mx-1",
             icon: "",
@@ -138,7 +138,7 @@ const generateNavItems = () => {
           {
             text: "Login/Register",
             title: "Open Authorization",
-            href: "/auth.html",
+            href: "auth.html",
             type: "link",
             class: "mx-1",
             icon: "",
@@ -246,6 +246,6 @@ const logoutBtns = document.querySelectorAll(".logout");
 logoutBtns.forEach((toggle) => {
   toggle.addEventListener("click", () => {
     localStorage.removeItem("authToken");
-    window.location.pathname = "/index.html";
+    window.location.pathname = "index.html";
   });
 });

@@ -1,5 +1,5 @@
 // scripts/theme-toggle.js
-import { highlightPreBlocks } from "/scripts/shiki-pre.js";
+import { highlightPreBlocks } from "scripts/shiki-pre.js";
 
 /******************************************************************************/
 /* 1. Переключение темы. */

@@ -21,7 +21,7 @@ const mockData = [
   },
   {
     id: "c3958f89",
-    title: "Разобраться с неправильными датами в Todo.App",
+    title: "Покормить кота",
     completed: false,
     date: 1763996400000,
     createdAt: 1763843666147,

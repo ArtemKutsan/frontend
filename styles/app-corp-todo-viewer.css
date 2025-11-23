@@ -29,22 +29,32 @@ input#todos-search {
 
 select {
   text-align: center;
-  background: var(--color-accent);
-  color: var(--color-bg);
   border-radius: 9999px;
   border: 2px solid var(--color-bg);
+  width: 100%;
+  height: 100%;
 
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-  background-image: none;
-  padding: 0 1rem;
+
+  padding: 0 2.5rem 0 1rem;
   /* overflow: hidden; */
   font-family: inherit;
   font-feature-settings: inherit;
   font-size: var(--font-sm);
+  font-weight: 500;
   /* min-height: 2.5rem; */
   min-width: 2.5rem;
+
+  background-color: var(--color-accent);
+  color: var(--color-bg);
+
+  /* background-image: url("/assets/icons/arrow-drop-down.svg");
+  background-repeat: no-repeat;
+  background-position: right 0.25rem center;
+  background-size: 2rem; */
+  cursor: pointer;
 }
 
 /* ===== Фильтр задач ===== */
@@ -99,15 +109,15 @@ select {
   /* column-count: 4; */
   gap: 1rem;
   /* grid-auto-rows: masonry; */
-  grid-auto-flow: dense; /* заполняет пробелы */
-  column-fill: auto; /* заполнение по высоте */
+  grid-auto-flow: dense; /* Заполняет пробелы */
+  column-fill: auto; /* Заполнение по высоте */
 }
 
 .todo-card {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  break-inside: avoid; /* не ломать элемент */
+  gap: 0.5rem;
+  break-inside: avoid; /* Не ломать элемент */
   padding: 0.75rem 0.875rem 0.75rem 1rem;
   border-radius: 1.25rem;
   background: var(--color-bg-accent);

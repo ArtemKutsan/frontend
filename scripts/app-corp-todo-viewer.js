@@ -1,7 +1,13 @@
+const cleanInputBtns = document.querySelectorAll(".clean-input-btn");
+
 const BASE_URL = "https://jsonplaceholder.typicode.com";
 const todosUrl = `${BASE_URL}/todos`;
 const usersUrl = `${BASE_URL}/users`;
 let mergedData = [];
+
+// Делаем заглавной первую букву в строке
+const capitalizeFirstLetter = (str) =>
+  str ? str[0].toUpperCase() + str.slice(1) : str;
 
 // Объединение данных
 const mergeTodosWithUsers = (todos, users) =>
@@ -28,8 +34,6 @@ const renderTodos = (data, userId = "all") => {
   const todosListEl = document.querySelector("#todos-list");
   todosListEl.innerHTML = "";
 
-  // console.log(userId);
-
   if (userId === "all") {
     data.forEach((todo) => {
       const todoCardDiv = document.createElement("div");
@@ -38,8 +42,11 @@ const renderTodos = (data, userId = "all") => {
         "todo-card" + (todo.completed ? " completed" : "");
 
       todoCardDiv.innerHTML = `
-        <span class="text-sm text-lite">${todo.user.name} (${todo.user.email})</span>
-        <span class="todo-title">${todo.title}</span>
+        <span class="text-sm text-lite">${todo.user.name}</span>
+        <span class="todo-title flex-1">${capitalizeFirstLetter(
+          todo.title
+        )}</span>
+        <a href="mailto:${todo.user.email.toLowerCase()}" class="link text-xs">${todo.user.email.toLowerCase()}</a>
       `;
 
       todosListEl.appendChild(todoCardDiv);
@@ -50,7 +57,9 @@ const renderTodos = (data, userId = "all") => {
 
       todoCardDiv.className =
         "todo-card" + (todo.completed ? " completed" : "");
-      todoCardDiv.innerHTML = `<span class="todo-title">${todo.title}</span>`;
+      todoCardDiv.innerHTML = `<span class="todo-title">${capitalizeFirstLetter(
+        todo.title
+      )}</span>`;
 
       todosListEl.appendChild(todoCardDiv);
     });
@@ -58,20 +67,28 @@ const renderTodos = (data, userId = "all") => {
 };
 
 // Статистика
+// Статистика
 const calculateStatistics = (data, userInfo = null) => {
   const total = data.length;
   const completed = data.filter((todo) => todo.completed).length;
   const percent = total ? ((completed / total) * 100).toFixed(1) : 0;
   const remaining = total - completed;
 
-  let statsText = `Всего задач: ${total} | Выполнено: ${completed} (${percent}%) | Осталось: ${remaining}`;
+  let statsHTML = `
+    <span>Всего задач: ${total},</span>
+    <span>Выполнено: ${completed} (${percent}%),</span>
+    <span>Осталось: ${remaining}</span>
+  `;
 
   if (userInfo) {
-    statsText =
-      `Пользователь: ${userInfo.name} (${userInfo.email}) ` + statsText;
+    statsHTML =
+      `
+      <span>Пользователь: ${userInfo.name}</span>
+      (<a href="mailto:${userInfo.email.toLowerCase()}" class="link">${userInfo.email.toLowerCase()}</a>),
+    ` + statsHTML;
   }
 
-  document.querySelector("#stats").textContent = statsText;
+  document.querySelector("#stats").innerHTML = statsHTML;
 };
 
 // Фильтр по пользователю и получение информации о нём
@@ -107,8 +124,9 @@ const filterBySearch = (data, searchStr) =>
 // Сортировка задач по выполнению
 const sortTodos = (data) => data.sort((a, b) => a.completed - b.completed);
 
-// Общая функция применения фильтров (решение с промисами)
+// Общая функция применения фильтров (решение с промисами???)
 const applyFilters = async () => {
+  // console.log("Working applyFilters");
   const userId = document.querySelector("#user-select").value; // Возвращает "all" для All users или userId
   const filter =
     document.querySelector('input[name="filter"]:checked')?.id.toLowerCase() ||
@@ -126,6 +144,27 @@ const applyFilters = async () => {
     .then((data) => renderTodos(data, userId))
     .catch(console.error);
 };
+
+// // Общая функция применения фильтров (решение с промисами???)
+// const applyFilters = async () => {
+//   console.log("Working applyFilters");
+//   const userId = document.querySelector("#user-select").value; // Возвращает "all" для All users или userId
+//   const filter =
+//     document.querySelector('input[name="filter"]:checked')?.id.toLowerCase() ||
+//     "all";
+//   const searchStr = document
+//     .querySelector("#todos-search")
+//     .value.trim()
+//     .toLowerCase();
+
+//   return Promise.resolve(mergedData)
+//     .then((data) => filterByUser(data, userId))
+//     .then((data) => filterByStatus(data, filter))
+//     .then((data) => filterBySearch(data, searchStr))
+//     .then(sortTodos)
+//     .then((data) => renderTodos(data, userId))
+//     .catch(console.error);
+// };
 
 // // Фильтрация обычная
 // const applyFilters = () => {
@@ -173,6 +212,13 @@ const applyFilters = async () => {
 
 //   renderTodos(sorted, userInfo);
 // }
+
+cleanInputBtns.forEach((button) =>
+  button.addEventListener("click", (event) => {
+    event.currentTarget.parentElement.querySelector("input").value = "";
+    applyFilters();
+  })
+);
 
 // Инициализация
 Promise.all([

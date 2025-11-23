@@ -146,7 +146,6 @@ header {
 .dropdown {
   position: relative;
   /* background: var(--color-bg); */
-
 }
 
 .dropdown > button {
@@ -309,6 +308,9 @@ h6 {
 }
 .text-inverse {
   color: var(--color-text-inverse);
+}
+.text-elevated {
+  color: var(--color-elevated);
 }
 
 /* ===== Background colors ===== */

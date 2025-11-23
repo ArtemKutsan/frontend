@@ -100,71 +100,49 @@
                 </div>
 
                 <div id="todos-list" class="flex flex-col gap-4">
-                  <!-- <label class="todo">
-                    <input type="checkbox">
-                    <span class="checkbox"></span>
+                  <!-- Тут рендерятся все Todo -->
+                </div>
+              </form>
 
-                    <div class="todo-content">
-                      <span class="todo-datetime">10 января, 11:30</span>
-                      <span class="todo-title">Покормить кошку</span>
-                    </div>
+              <button id="add-todo-btn" class="sticky btn btn-accent btn-round btn-lg shadow">
+                <span class="text-2xl material-symbols-outlined">
+                  add
+                </span>
+              </button>
+            </div>
 
-                    <button type="button" class="edit-btn btn btn-ghost">
-                      <span class="text-2xl material-symbols-outlined">
-                        edit
-                      </span>
-                    </button>
+            <div id="todo-dialog" class="invisible">
+              <form class="flex flex-col gap-4">
+                <!-- <h6>New Todo</h6> -->
+                <div class="relative flex items-center">
+                  <input id="new-todo-title" class="new-todo-title" type="text" name="new-todo-title" value=""
+                    placeholder="Задача">
+                  <button type="button" class="clean-input-btn absolute right-1 btn btn-ghost btn-sm">
+                    <span class="text-secondary material-symbols-outlined">
+                      close
+                    </span>
+                  </button>
+                </div>
 
-                    <button type="button" class="delete-btn btn btn-ghost">
-                      <span class="text-2xl material-symbols-outlined">
-                        delete
-                      </span>
-                    </button>
-                  </label>
-                </div> -->
+                <div class="flex gap-2">
+                  <input id="new-todo-date" class="new-todo-date" type="date" name="new-todo-date">
+                  <input id="new-todo-time" class="new-todo-time" type="time" name="new-todo-time">
+                </div>
+
+                <div class="flex justify-end gap-2">
+                  <button id="cancel-btn" type="button"
+                    class="flex-1 btn btn-accent btn-bordered btn-round px-6">Отмена</button>
+                  <input id="todo-dialog-action-btn" type="submit" class="flex-1 btn btn-accent btn-round px-6"
+                    value="Добавить">
+                </div>
               </form>
             </div>
 
-            <button id="add-todo-btn" class="sticky btn btn-accent btn-round btn-lg shadow">
-              <span class="text-2xl material-symbols-outlined">
-                add
-              </span>
-            </button>
           </div>
-
-
-
-          <div id="action-todo" class="invisible">
-            <form class="flex flex-col gap-4">
-              <!-- <h6>New Todo</h6> -->
-              <div class="relative flex items-center">
-                <input id="new-todo-title" class="new-todo-title" type="text" name="new-todo-title" value=""
-                  placeholder="Задача">
-                <button type="button" class="clean-input-btn absolute right-1 btn btn-ghost btn-sm">
-                  <span class="text-secondary material-symbols-outlined">
-                    close
-                  </span>
-                </button>
-              </div>
-
-              <div class="flex gap-2">
-                <input id="new-todo-date" class="new-todo-date" type="date" name="new-todo-date">
-                <input id="new-todo-time" class="new-todo-time" type="time" name="new-todo-time">
-              </div>
-
-              <div class="flex justify-end gap-2">
-                <button id="cancel-btn" type="button"
-                  class="flex-1 btn btn-accent btn-bordered btn-round px-6">Отмена</button>
-                <input id="action-todo-btn" type="submit" class="flex-1 btn btn-accent btn-round px-6" value="Добавить">
-              </div>
-            </form>
-          </div>
-
+          <!-- ===== TODO APP END ===== -->
         </div>
-        <!-- ===== TODO APP END ===== -->
-  </div>
-  </section>
-  </main>
+      </section>
+    </main>
 
   </div>
 

@@ -28,15 +28,11 @@ const mockData = [
   },
 ];
 
-// Получение списка todos из localStorage
-const getTodos = () => JSON.parse(localStorage.getItem(todosKey));
-
 // Основной массив задач в памяти
 let todos = getTodos() || mockData;
 
-// Сохранение списка задач в localStorage
-const storageTodos = () =>
-  localStorage.setItem(todosKey, JSON.stringify(todos));
+// id редактируемой задачи
+let currentEditingId = null;
 
 // DOM элементы
 const todosListEl = document.querySelector("#todos-list");
@@ -44,33 +40,48 @@ const todosFilterEl = document.querySelector("#todos-filter");
 const todosSearchEl = document.querySelector("#todos-search");
 const cleanInputBtns = document.querySelectorAll(".clean-input-btn");
 const addTodoBtn = document.querySelector("#add-todo-btn");
-const actionTodoDiv = document.querySelector("#action-todo");
-const actionTodoBtn = document.querySelector("#action-todo-btn");
+const todoDialogEl = document.querySelector("#todo-dialog");
+const todoDialogActionBtn = document.querySelector("#todo-dialog-action-btn");
 const cancelBtn = document.querySelector("#cancel-btn");
 
-// id редактируемой задачи
-let currentEditingId = null;
+// Определяем текущую дату
+now = new Date(); // Объявлена в timer.js (переделать на модуль???)
+const weekday = now.toLocaleString("ru-RU", { weekday: "long" });
+const date = now.toLocaleString("ru-RU", { day: "numeric", month: "long" });
+
+// Отображаем текущую дату в заголовке приложения
+document.querySelector(".current-weekday").textContent =
+  capitalizeFirstLetter(weekday);
+document.querySelector(".current-date").textContent = date;
+
+// Получение списка todos из localStorage
+function getTodos() {
+  return JSON.parse(localStorage.getItem(todosKey));
+}
+
+// Сохранение списка задач в localStorage
+const storageTodos = () =>
+  localStorage.setItem(todosKey, JSON.stringify(todos));
 
 // Заглавная первая буква
-const capitalizeFirstLetter = (str) =>
-  str ? str[0].toUpperCase() + str.slice(1) : str;
+function capitalizeFirstLetter(str) {
+  return str ? str[0].toUpperCase() + str.slice(1) : str;
+}
 
 // Поиск задачи по id
 const findTodo = (id) => todos.find((todo) => todo.id === id);
 
-// Фильтр по выполнению
-const filterByStatus = (list, filter) =>
-  filter === "active"
-    ? list.filter((t) => !t.completed)
-    : filter === "done"
-    ? list.filter((t) => t.completed)
+// Фильтр по статусу выполнения
+const filterByStatus = (list, status) =>
+  status === "active"
+    ? list.filter((todo) => !todo.completed)
+    : status === "done"
+    ? list.filter((todo) => todo.completed)
     : list;
 
-// Фильтр по поиску
-const filterBySearch = (list, searchStr) =>
-  searchStr
-    ? list.filter((todo) => todo.title.toLowerCase().includes(searchStr))
-    : list;
+// Фильтр по строке
+const filterByString = (list, str) =>
+  str ? list.filter((todo) => todo.title.toLowerCase().includes(str)) : list;
 
 // Сортировка: сначала по выполнению, затем по дате
 const sortTodos = (list) =>
@@ -174,7 +185,7 @@ const renderTodos = () => {
 
   let todosList = todos;
   todosList = filterByStatus(todosList, filter);
-  todosList = filterBySearch(todosList, searchStr);
+  todosList = filterByString(todosList, searchStr);
   todosList = sortTodos(todosList);
 
   todosListEl.innerHTML = "";
@@ -193,6 +204,7 @@ cleanInputBtns.forEach((button) =>
   })
 );
 
+// Слушатель кнопки открытия диалога добавления задачи
 addTodoBtn.addEventListener("click", () => {
   currentEditingId = null;
 
@@ -209,13 +221,13 @@ addTodoBtn.addEventListener("click", () => {
     }
   );
 
-  actionTodoBtn.value = "Добавить";
+  todoDialogActionBtn.value = "Добавить";
 
   document.body.classList.toggle("no-scroll");
-  actionTodoDiv.classList.toggle("invisible");
+  todoDialogEl.classList.toggle("invisible");
 });
 
-actionTodoBtn.addEventListener("click", (event) => {
+todoDialogActionBtn.addEventListener("click", (event) => {
   event.preventDefault();
 
   const title = document.querySelector("#new-todo-title").value.trim();
@@ -229,13 +241,13 @@ actionTodoBtn.addEventListener("click", (event) => {
   if (currentEditingId) {
     editTodo(currentEditingId, title, datetime);
     currentEditingId = null;
-    actionTodoBtn.value = "Добавить";
+    // todoDialogActionBtn.value = "Добавить"; // Протестировать!!!
   } else {
     addTodo(title, datetime);
   }
 
   document.body.classList.toggle("no-scroll");
-  actionTodoDiv.classList.toggle("invisible");
+  todoDialogEl.classList.toggle("invisible");
 
   renderTodos();
 });
@@ -244,9 +256,9 @@ cancelBtn.addEventListener("click", () => {
   currentEditingId = null;
 
   document.body.classList.toggle("no-scroll");
-  actionTodoDiv.classList.toggle("invisible");
+  todoDialogEl.classList.toggle("invisible");
 
-  // actionTodoBtn.value = "Добавить";
+  // todoDialogActionBtn.value = "Добавить"; // Протестировать!!!
 });
 
 todosListEl.addEventListener("click", (event) => {
@@ -268,7 +280,7 @@ todosListEl.addEventListener("click", (event) => {
     currentEditingId = id;
 
     document.querySelector("#new-todo-title").value = todo.title;
-    actionTodoBtn.value = "Изменить";
+    todoDialogActionBtn.value = "Изменить";
 
     const date = new Date(todo.date);
 
@@ -286,7 +298,7 @@ todosListEl.addEventListener("click", (event) => {
     );
 
     document.body.classList.toggle("no-scroll");
-    actionTodoDiv.classList.toggle("invisible");
+    todoDialogEl.classList.toggle("invisible");
     return;
   }
 

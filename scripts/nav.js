@@ -59,7 +59,7 @@ const generateNavItems = () => {
             title: "Open Authorization",
             href: "auth.html",
             type: "link",
-            class: "mx-1",
+            class: "mx-1 text-sm",
             icon: "",
           },
           {
@@ -67,7 +67,7 @@ const generateNavItems = () => {
             title: "Open Todo.App",
             href: "app-todo.html",
             type: "link",
-            class: "mx-1",
+            class: "mx-1 text-sm",
             icon: "",
           },
           {
@@ -75,7 +75,7 @@ const generateNavItems = () => {
             title: "Open CorpTodoViewer.App",
             href: "app-corp-todo-viewer.html",
             type: "link",
-            class: "mx-1",
+            class: "mx-1 text-sm",
             icon: "",
           },
         ],
@@ -140,7 +140,7 @@ const generateNavItems = () => {
             title: "Open Authorization",
             href: "auth.html",
             type: "link",
-            class: "mx-1",
+            class: "mx-1 text-sm",
             icon: "",
           },
           {
@@ -148,7 +148,7 @@ const generateNavItems = () => {
             title: "Open Todo.App",
             href: "app-todo.html",
             type: "link",
-            class: "mx-1",
+            class: "mx-1 text-sm",
             icon: "",
           },
           {
@@ -156,7 +156,7 @@ const generateNavItems = () => {
             title: "Open CorpTodoViewer.App",
             href: "app-corp-todo-viewer.html",
             type: "link",
-            class: "mx-1",
+            class: "mx-1 text-sm",
             icon: "",
           },
         ],

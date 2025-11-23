@@ -154,6 +154,7 @@ header {
 
 .dropdown-content {
   position: absolute;
+  /* margin-top: 0.5rem; */
   top: 100%;
   right: 0;
 

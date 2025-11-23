@@ -134,47 +134,53 @@ const deleteTodo = (id) => {
 
 // Создание HTML элемента задачи
 const createTodoElement = (todo) => {
-  const label = document.createElement("label");
-  label.className = "todo";
-  label.dataset.id = todo.id;
+  const labelTodoEl = document.createElement("label");
+  labelTodoEl.className = "todo";
+  labelTodoEl.dataset.id = todo.id;
 
-  const checkbox = document.createElement("input");
-  checkbox.type = "checkbox";
-  checkbox.checked = todo.completed;
+  const checkboxInputEl = document.createElement("input");
+  checkboxInputEl.type = "checkbox";
+  checkboxInputEl.checked = todo.completed;
 
-  const spanCheckbox = document.createElement("span");
-  spanCheckbox.className = "checkbox";
+  const spanCheckboxEl = document.createElement("span");
+  spanCheckboxEl.className = "checkbox";
 
-  const contentDiv = document.createElement("div");
-  contentDiv.className = "todo-content";
+  const divTodoContentEl = document.createElement("div");
+  divTodoContentEl.className = "todo-content";
 
-  const dateSpan = document.createElement("span");
-  dateSpan.className = "todo-datetime";
-  dateSpan.textContent = new Date(todo.date).toLocaleString("ru-RU", {
+  const spanTodoDatetimeEl = document.createElement("span");
+  spanTodoDatetimeEl.className = "todo-datetime";
+  spanTodoDatetimeEl.textContent = new Date(todo.date).toLocaleString("ru-RU", {
     day: "numeric",
     month: "long",
     hour: "2-digit",
     minute: "2-digit",
   });
 
-  const titleSpan = document.createElement("span");
-  titleSpan.className = "todo-title";
-  titleSpan.textContent = todo.title;
+  const spanTodoTitleEl = document.createElement("span");
+  spanTodoTitleEl.className = "todo-title";
+  spanTodoTitleEl.textContent = todo.title;
 
-  const buttonEdit = document.createElement("button");
-  buttonEdit.type = "button";
-  buttonEdit.className = "edit-btn btn btn-ghost";
-  buttonEdit.innerHTML = `<span class="text-2xl material-symbols-outlined">edit</span>`;
+  const buttonEditBtnEl = document.createElement("button");
+  buttonEditBtnEl.type = "button";
+  buttonEditBtnEl.className = "edit-btn btn btn-ghost";
+  buttonEditBtnEl.innerHTML = `<span class="text-2xl material-symbols-outlined">edit</span>`;
 
-  const buttonDelete = document.createElement("button");
-  buttonDelete.type = "button";
-  buttonDelete.className = "delete-btn btn btn-ghost";
-  buttonDelete.innerHTML = `<span class="text-2xl material-symbols-outlined">delete</span>`;
+  const buttonDeleteBtnEl = document.createElement("button");
+  buttonDeleteBtnEl.type = "button";
+  buttonDeleteBtnEl.className = "delete-btn btn btn-ghost";
+  buttonDeleteBtnEl.innerHTML = `<span class="text-2xl material-symbols-outlined">delete</span>`;
 
-  contentDiv.append(dateSpan, titleSpan);
-  label.append(checkbox, spanCheckbox, contentDiv, buttonEdit, buttonDelete);
+  divTodoContentEl.append(spanTodoDatetimeEl, spanTodoTitleEl);
+  labelTodoEl.append(
+    checkboxInputEl,
+    spanCheckboxEl,
+    divTodoContentEl,
+    buttonEditBtnEl,
+    buttonDeleteBtnEl
+  );
 
-  return label;
+  return labelTodoEl;
 };
 
 // Рендер списка задач

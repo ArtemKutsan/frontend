@@ -29,9 +29,21 @@ const mockTodosData = [
   },
 ];
 
+// Тестовые данные при первом запуске (при пустом localStorage)
+mockTrashData = [
+  {
+    id: "c3958f89",
+    title: "Купить батарейки",
+    completed: true,
+    date: 1763996400000,
+    createdAt: 1763843666147,
+    deleted: true,
+  },
+];
+
 // Основные массивы задач в памяти
 let todos = getData(todosKey) || mockTodosData;
-let trash = getData(trashKey) || [];
+let trash = getData(trashKey) || mockTrashData;
 
 // id редактируемой задачи
 let currentEditingId = null;

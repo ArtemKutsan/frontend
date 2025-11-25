@@ -1,5 +1,3 @@
-const cleanInputBtns = document.querySelectorAll(".clean-input-btn");
-
 const BASE_URL = "https://jsonplaceholder.typicode.com";
 const todosUrl = `${BASE_URL}/todos`;
 const usersUrl = `${BASE_URL}/users`;
@@ -10,24 +8,21 @@ const capitalizeFirstLetter = (str) =>
   str ? str[0].toUpperCase() + str.slice(1) : str;
 
 // Объединение данных
-const mergeTodosWithUsers = (todos, users) =>
-  todos
-    .map((todo) => {
-      const user = users.find((u) => u.id === todo.userId);
-      if (!user) return null;
+const mergeData = (todos, users) =>
+  todos.map((todo) => {
+    const user = users.find((u) => String(u.id) === String(todo.userId));
 
-      return {
-        todoId: todo.id,
-        title: todo.title,
-        completed: todo.completed,
-        user: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-        },
-      };
-    })
-    .filter(Boolean);
+    return {
+      todoId: todo.id,
+      title: todo.title,
+      completed: todo.completed,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+      },
+    };
+  });
 
 // Рендер списка todo
 const renderTodos = (data, userId = "all") => {
@@ -66,7 +61,6 @@ const renderTodos = (data, userId = "all") => {
   }
 };
 
-// Статистика
 // Статистика
 const calculateStatistics = (data, userInfo = null) => {
   const total = data.length;
@@ -124,129 +118,87 @@ const filterBySearch = (data, searchStr) =>
 // Сортировка задач по выполнению
 const sortTodos = (data) => data.sort((a, b) => a.completed - b.completed);
 
-// Общая функция применения фильтров (решение с промисами???)
-const applyFilters = async () => {
-  // console.log("Working applyFilters");
-  const userId = document.querySelector("#user-select").value; // Возвращает "all" для All users или userId
+// Общая функция применения фильтров
+const applyFilters = () => {
+  // Считываем значение из select для фильтра по пользователю
+  const userId = document.querySelector("#user-select").value;
+
+  // Считываем значение из input (radio) для фильтра по статусу выполнения
   const filter =
     document.querySelector('input[name="filter"]:checked')?.id.toLowerCase() ||
     "all";
+
+  // Считываем значение строки поиска для фильта по подстроке в названии todo
   const searchStr = document
     .querySelector("#todos-search")
     .value.trim()
     .toLowerCase();
 
-  return Promise.resolve(mergedData)
-    .then((data) => filterByUser(data, userId))
-    .then((data) => filterByStatus(data, filter))
-    .then((data) => filterBySearch(data, searchStr))
-    .then(sortTodos)
-    .then((data) => renderTodos(data, userId))
-    .catch(console.error);
+  // Применяем все фильтры
+  let data = mergedData;
+
+  data = filterByUser(data, userId);
+  data = filterByStatus(data, filter);
+  data = filterBySearch(data, searchStr);
+  data = sortTodos(data);
+
+  // Рендерим отфильтрованные данные
+  renderTodos(data, userId);
 };
 
-// // Общая функция применения фильтров (решение с промисами???)
-// const applyFilters = async () => {
-//   console.log("Working applyFilters");
-//   const userId = document.querySelector("#user-select").value; // Возвращает "all" для All users или userId
-//   const filter =
-//     document.querySelector('input[name="filter"]:checked')?.id.toLowerCase() ||
-//     "all";
-//   const searchStr = document
-//     .querySelector("#todos-search")
-//     .value.trim()
-//     .toLowerCase();
+// Универсальный загрузчик данных
+const loadData = async (url) => {
+  let data = [];
 
-//   return Promise.resolve(mergedData)
-//     .then((data) => filterByUser(data, userId))
-//     .then((data) => filterByStatus(data, filter))
-//     .then((data) => filterBySearch(data, searchStr))
-//     .then(sortTodos)
-//     .then((data) => renderTodos(data, userId))
-//     .catch(console.error);
-// };
+  try {
+    const response = await fetch(url);
+    data = await response.json();
+  } catch (error) {
+    console.error("Error loading data:", error);
+  }
 
-// // Фильтрация обычная
-// const applyFilters = () => {
-//   const filter =
-//     document.querySelector('input[name="filter"]:checked')?.id || "all";
-
-//   const userId = document.querySelector("#user-select").value;
-//   const searchStr = document
-//     .querySelector("#todos-search")
-//     .value.trim()
-//     .toLowerCase();
-
-//   let filtered = mergedData;
-//   let statsData = mergedData;
-//   let userInfo = null;
-
-//   if (userId !== "all") {
-//     filtered = filtered.filter((t) => t.user.id == userId);
-//     statsData = filtered;
-
-//     const sampleTodo = filtered[0];
-//     if (sampleTodo) {
-//       userInfo = {
-//         name: sampleTodo.user.name,
-//         email: sampleTodo.user.email,
-//       };
-//     }
-//   }
-
-//   calculateStatistics(statsData, userInfo);
-
-//   if (filter === "active") {
-//     filtered = filtered.filter((t) => !t.completed);
-//   } else if (filter === "done") {
-//     filtered = filtered.filter((t) => t.completed);
-//   }
-
-//   if (searchStr) {
-//     filtered = filtered.filter((t) =>
-//       t.title.toLowerCase().includes(searchStr)
-//     );
-//   }
-
-//   sorted = filtered.sort((a, b) => a.completed - b.completed);
-
-//   renderTodos(sorted, userInfo);
-// }
-
-cleanInputBtns.forEach((button) =>
-  button.addEventListener("click", (event) => {
-    event.currentTarget.parentElement.querySelector("input").value = "";
-    applyFilters();
-  })
-);
+  return data;
+};
 
 // Инициализация
-Promise.all([
-  fetch(todosUrl).then((response) => response.json()),
-  fetch(usersUrl).then((response) => response.json()),
-]).then(([todos, users]) => {
-  mergedData = mergeTodosWithUsers(todos, users);
+Promise.all([loadData(todosUrl), loadData(usersUrl)]).then(([todos, users]) => {
+  mergedData = mergeData(todos, users);
 
-  // Заполнение select
+  // Заполнение select списком полченных пользователей
   const userSelectEl = document.querySelector("#user-select");
 
   userSelectEl.innerHTML =
     `<option value="all">All users</option>` +
-    users.map((u) => `<option value="${u.id}">${u.name}</option>`).join("");
+    users
+      .map((user) => `<option value="${user.id}">${user.name}</option>`)
+      .join("");
 
-  // Обработчики
+  /* ===== События ===== */
+  // Обработчик события ввода в строку поиска input (text) #todos-search
   document
     .querySelector("#todos-search")
     .addEventListener("input", applyFilters);
 
+  // Обработчик события выбора статуса выполнения input (radio) name="filter"
   document
     .querySelectorAll('input[name="filter"]')
     .forEach((radio) => radio.addEventListener("change", applyFilters));
 
+  // Обработчик события на выбор пользователя select #user-select
   document
     .querySelector("#user-select")
     .addEventListener("change", applyFilters);
 
-  renderTodos(sortTodos(mergedData));
+  // Обработчики событий кнопок очистки введенной строки на всех input (text)
+  document.querySelectorAll(".clean-input-btn").forEach((button) =>
+    button.addEventListener("click", (event) => {
+      event.currentTarget.parentElement.querySelector("input").value = "";
+
+      applyFilters();
+    })
+  );
+
+  // При первом запусе отображаем статистику и рендерим данные
   calculateStatistics(mergedData);
+  renderTodos(sortTodos(mergedData));
 });

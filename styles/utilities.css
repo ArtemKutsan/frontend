@@ -439,6 +439,9 @@
 .mt-10 {
   margin-top: 2.5rem;
 }
+.mt-auto {
+  margin-top: auto;
+}
 
 .mb-0 {
   margin-bottom: 0;
@@ -506,6 +509,9 @@
 }
 .ml-10 {
   margin-left: 2.5rem;
+}
+.ml-auto {
+  margin-left: auto;
 }
 
 .mr-0 {
@@ -952,6 +958,11 @@
   pointer-events: none;
 }
 
+.inactive {
+  opacity: 0.5 !important;
+  cursor: auto !important;
+}
+
 /* ===== Text colors ===== */
 .text-light {
   color: var(--color-light);
@@ -984,4 +995,8 @@
 }
 .bg-inverse {
   background-color: var(--color-accent);
+}
+
+.z-9999 {
+  z-index: 9999;
 }

@@ -126,71 +126,38 @@ const todoUrl = `${BASE_URL}/todos/1`;
 
 // createPost();
 
-// 24-11-25
-// /* 4***. Создать функцию, которая будет отправлять асинхронные запросы на сервер с задержкой,
-// используя setTimeout и await. Задержка должна быть случайной в пределах определенного диапазона.
-// Дождаться выполнения каждого запроса перед отправкой следующего и вернуть массив результатов
-// в том порядке, в котором они были отправлены.
-// */
-// const randomInt = (min = 0, max = 5) =>
-//   Math.floor(Math.random() * (max - min + 1) + min);
+/* 4***. Создать функцию, которая будет отправлять асинхронные запросы на сервер с задержкой, 
+используя setTimeout и await. Задержка должна быть случайной в пределах определенного диапазона. 
+Дождаться выполнения каждого запроса перед отправкой следующего и вернуть массив результатов 
+в том порядке, в котором они были отправлены. 
+*/
+const randomInt = (min = 0, max = 5) =>
+  Math.floor(Math.random() * (max - min + 1) + min);
 
-// const randomDelay = (min = 0, max = 5) =>
-//   new Promise((resolve) => setTimeout(resolve, randomInt(min, max) * 1000));
+const randomDelay = (min = 0, max = 5) =>
+  new Promise((resolve) => setTimeout(resolve, randomInt(min, max) * 1000));
 
-// const loadAll = async (urls) => {
-//   const results = [];
+const loadAll = async (urls) => {
+  const results = [];
 
-//   for (const url of urls) {
-//     const response = await fetch(url);
-//     console.log(`Запросили данные из ${url}`);
+  for (const url of urls) {
+    const response = await fetch(url);
+    console.log(`Запросили данные из ${url}`);
 
-//     await randomDelay(); // Иммитируем случайную задержку получения ответа
+    await randomDelay(); // Иммитируем случайную задержку получения ответа
 
-//     const data = await response.json();
-//     console.log(`Получили данные из ${url}`);
-
-//     results.push(data);
-//   }
-
-//   return results;
-// };
-
-// // Использование
-// (async () => {
-//   const urls = [usersUrl, postsUrl, todosUrl];
-//   const data = await loadAll(urls);
-//   console.log(data); // Массив результатов в порядке отправки
-// })();
-
-// // 25-11-25
-
-// async function fetchData(url) {
-//   try {
-//     const response = await fetch(url);
-//   } catch (error) {
-//     console.error("!!!Ошибка:", error.message);
-//   }
-// }
-
-// // Вызов
-// fetchData("https://invalid-url.example");
-
-const fetchTodos = async () => {
-  try {
-    const response = await fetch("https://dummyjson.com/todos");
-    if (!response.ok) {
-      throw new Error("ошибка при получении задач");
-    }
     const data = await response.json();
-    const { todos } = data;
-    const lastId = todos.reduce(
-      (max, currentValue) => (currentValue.id > max ? currentValue.id : max),
-      0
-    );
-    return todos;
-  } catch (error) {
-    console.log(error);
-    return [];
+    console.log(`Получили данные из ${url}`);
+
+    results.push(data);
   }
+
+  return results;
 };
+
+// Использование
+(async () => {
+  const urls = [usersUrl, postsUrl, todosUrl];
+  const data = await loadAll(urls);
+  console.log(data); // Массив результатов в порядке отправки
+})();

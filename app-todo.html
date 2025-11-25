@@ -62,11 +62,11 @@
 
             <div id="app-todo">
               <div id="app-header">
-                <h2 class="current-weekday"></h2>
+                <h3 class="current-weekday"></h3>
                 <span class="current-date"></span>
               </div>
 
-              <form class="flex flex-col gap-4">
+              <form id="app-form" class="flex flex-col gap-4">
                 <div id="filters">
 
                   <div class="relative flex items-center">
@@ -81,21 +81,38 @@
                     </button>
                   </div>
 
-                  <div id="todos-filter">
+                  <div class="todos-filter">
                     <label class="filter" for="all">
                       <input type="radio" id="all" name="filter">
-                      <span>All</span>
+                      <!-- <span>All</span> -->
+                      <span class="material-symbols-outlined">
+                        list_alt
+                      </span>
                     </label>
 
                     <label class="filter" for="active">
                       <input type="radio" id="active" name="filter" checked>
-                      <span>Active</span>
+                      <!-- <span>Active</span> -->
+                      <span class="material-symbols-outlined">
+                        overview
+                      </span>
                     </label>
 
                     <label class="filter" for="done">
                       <input type="radio" id="done" name="filter">
-                      <span>Done</span>
+                      <!-- <span>Done</span> -->
+                      <span class="material-symbols-outlined">
+                        list_alt_check
+                      </span>
                     </label>
+
+                    <!-- <label class="filter" for="deleted">
+                      <input type="radio" id="deleted" name="filter">
+                      <span class="material-symbols-outlined">
+                        delete
+                      </span>
+                    </label> -->
+
                   </div>
                 </div>
 
@@ -104,11 +121,23 @@
                 </div>
               </form>
 
-              <button id="add-todo-btn" class="sticky btn btn-accent btn-round btn-lg shadow">
-                <span class="text-2xl material-symbols-outlined">
-                  add
-                </span>
-              </button>
+
+              <div class="sticky z-9999 ml-auto mt-auto bottom-8 flex gap-4">
+                <div class="todos-filter">
+                  <label id="trash" class="filter btn btn-lg shadow" for="deleted">
+                    <input form="app-form" type="radio" id="deleted" name="filter">
+                    <span class="material-symbols-outlined">
+                      delete
+                    </span>
+                  </label>
+                </div>
+
+                <button id="add-todo-btn" class="btn btn-accent btn-round btn-lg shadow">
+                  <span class="text-2xl material-symbols-outlined">
+                    add
+                  </span>
+                </button>
+              </div>
             </div>
 
             <div id="todo-dialog" class="invisible">

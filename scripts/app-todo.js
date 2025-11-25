@@ -1,10 +1,11 @@
 /* App Todo */
 
-// Ключ для localStorage
+// Ключи для localStorage
 const todosKey = "todos";
+const trashKey = "trash";
 
 // Тестовые данные при первом запуске (при пустом localStorage)
-const mockData = [
+const mockTodosData = [
   {
     id: "88bb9688",
     title: "Купить продукты",
@@ -28,15 +29,16 @@ const mockData = [
   },
 ];
 
-// Основной массив задач в памяти
-let todos = getTodos() || mockData;
+// Основные массивы задач в памяти
+let todos = getData(todosKey) || mockTodosData;
+let trash = getData(trashKey) || [];
 
 // id редактируемой задачи
 let currentEditingId = null;
 
 // DOM элементы
 const todosListEl = document.querySelector("#todos-list");
-const todosFilterEl = document.querySelector("#todos-filter");
+const todosFilterEls = document.querySelectorAll(".todos-filter");
 const todosSearchEl = document.querySelector("#todos-search");
 const cleanInputBtns = document.querySelectorAll(".clean-input-btn");
 const addTodoBtn = document.querySelector("#add-todo-btn");
@@ -54,14 +56,25 @@ document.querySelector(".current-weekday").textContent =
   capitalizeFirstLetter(weekday);
 document.querySelector(".current-date").textContent = date;
 
-// Получение списка todos из localStorage
-function getTodos() {
-  return JSON.parse(localStorage.getItem(todosKey));
+// Получение данных из localStorage
+function getData(key) {
+  return JSON.parse(localStorage.getItem(key));
 }
 
-// Сохранение списка задач в localStorage
-const storageTodos = () =>
-  localStorage.setItem(todosKey, JSON.stringify(todos));
+// Сохранение данных в localStorage
+const setData = (key, data) => localStorage.setItem(key, JSON.stringify(data));
+
+// Выбирает слово с правильным окончанием в зависимости от числа
+const pluralize = (n, one, few, many) => {
+  const abs = Math.abs(n);
+  const lastTwo = abs % 100;
+  const last = abs % 10;
+
+  if (lastTwo >= 11 && lastTwo <= 14) return many;
+  if (last === 1) return one;
+  if (last >= 2 && last <= 4) return few;
+  return many;
+};
 
 // Заглавная первая буква
 function capitalizeFirstLetter(str) {
@@ -77,6 +90,8 @@ const filterByStatus = (list, status) =>
     ? list.filter((todo) => !todo.completed)
     : status === "done"
     ? list.filter((todo) => todo.completed)
+    : status === "deleted"
+    ? trash
     : list;
 
 // Фильтр по строке
@@ -101,7 +116,7 @@ const addTodo = (title, date) => {
     createdAt: Date.now(),
   });
 
-  storageTodos();
+  setData(todosKey, todos);
 };
 
 // Изменение задачи
@@ -112,8 +127,11 @@ const editTodo = (id, title, date) => {
   todo.title = title;
   todo.date = date.getTime();
 
-  storageTodos();
+  setData(todosKey, todos);
 };
+
+// Пермещение в корзину
+// const moveToTrash = (todo) => {};
 
 // Переключение состояния выполнено/не выполнено
 const toggleTodo = (id) => {
@@ -122,21 +140,75 @@ const toggleTodo = (id) => {
 
   todo.completed = !todo.completed;
 
-  storageTodos();
+  setData(todosKey, todos);
 };
 
 // Удаление задачи
 const deleteTodo = (id) => {
-  todos = todos.filter((todo) => todo.id !== id);
+  // todos = todos.filter((todo) => todo.id !== id);
+  const { remaining, removed } = todos.reduce(
+    (acc, todo) =>
+      todo.id === id
+        ? { remaining: acc.remaining, removed: todo }
+        : (acc.remaining.push(todo), acc),
+    { remaining: [], removed: null }
+  );
 
-  storageTodos();
+  todos = remaining;
+  setData(todosKey, todos);
+
+  removed.deleted = true;
+  trash.push(removed);
+  setData(trashKey, trash);
+};
+
+// Восстановление удаленной задачи из корзины
+const restoreTodo = (id) => {
+  const { remaining, restored } = trash.reduce(
+    (acc, todo) =>
+      todo.id === id
+        ? { remaining: acc.remaining, restored: todo }
+        : (acc.remaining.push(todo), acc),
+    { remaining: [], restored: null }
+  );
+
+  trash = remaining;
+  setData(trashKey, trash);
+
+  const resoredTodo = {
+    id: restored.id,
+    title: restored.title,
+    completed: restored.completed,
+    date: restored.date,
+    createdAt: restored.createdAt,
+  };
+
+  todos.push(resoredTodo);
+  setData(todosKey, todos);
+};
+
+// Применяем фильтры
+const applyFilters = () => {
+  const filter =
+    document.querySelector('input[name="filter"]:checked')?.id || "all";
+  const searchStr = todosSearchEl.value.trim().toLowerCase();
+
+  let todosList = filterByStatus(todos, filter);
+  todosList = filterByString(todosList, searchStr);
+  todosList = sortTodos(todosList);
+
+  return todosList;
 };
 
 // Создание HTML элемента задачи
 const createTodoElement = (todo) => {
-  const labelTodoEl = document.createElement("label");
-  labelTodoEl.className = "todo";
-  labelTodoEl.dataset.id = todo.id;
+  const divEl = document.createElement("div");
+  divEl.className = "todo";
+  divEl.dataset.id = todo.id;
+
+  const labelEl = document.createElement("label");
+  // labelEl.className = "todo";
+  // labelEl.dataset.id = todo.id;
 
   const checkboxInputEl = document.createElement("input");
   checkboxInputEl.type = "checkbox";
@@ -161,48 +233,70 @@ const createTodoElement = (todo) => {
   spanTodoTitleEl.className = "todo-title";
   spanTodoTitleEl.textContent = todo.title;
 
-  const buttonEditBtnEl = document.createElement("button");
-  buttonEditBtnEl.type = "button";
-  buttonEditBtnEl.className = "edit-btn btn btn-ghost";
-  buttonEditBtnEl.innerHTML = `<span class="text-2xl material-symbols-outlined">edit</span>`;
+  if (!todo.deleted) {
+    const buttonEditBtnEl = document.createElement("button");
+    buttonEditBtnEl.type = "button";
+    buttonEditBtnEl.className = "edit-btn btn btn-ghost";
+    buttonEditBtnEl.innerHTML = `<span class="text-2xl material-symbols-outlined">edit</span>`;
 
-  const buttonDeleteBtnEl = document.createElement("button");
-  buttonDeleteBtnEl.type = "button";
-  buttonDeleteBtnEl.className = "delete-btn btn btn-ghost";
-  buttonDeleteBtnEl.innerHTML = `<span class="text-2xl material-symbols-outlined">delete</span>`;
+    const buttonDeleteBtnEl = document.createElement("button");
+    buttonDeleteBtnEl.type = "button";
+    buttonDeleteBtnEl.className = "delete-btn btn btn-ghost";
+    buttonDeleteBtnEl.innerHTML = `<span class="text-2xl material-symbols-outlined">delete</span>`;
 
-  divTodoContentEl.append(spanTodoDatetimeEl, spanTodoTitleEl);
-  labelTodoEl.append(
-    checkboxInputEl,
-    spanCheckboxEl,
-    divTodoContentEl,
-    buttonEditBtnEl,
-    buttonDeleteBtnEl
-  );
+    labelEl.append(checkboxInputEl, spanCheckboxEl);
+    divTodoContentEl.append(spanTodoDatetimeEl, spanTodoTitleEl);
+    divEl.append(labelEl, divTodoContentEl, buttonEditBtnEl, buttonDeleteBtnEl);
+  } else {
+    spanCheckboxEl.classList.add("inactive"); // Делаем chrckbox неактивным
 
-  return labelTodoEl;
+    const buttonRestoreBtnEl = document.createElement("button");
+    buttonRestoreBtnEl.type = "button";
+    buttonRestoreBtnEl.className = "restore-btn btn btn-ghost";
+    buttonRestoreBtnEl.innerHTML = `<span class="text-2xl material-symbols-outlined">restore_from_trash</span>`;
+
+    labelEl.append(checkboxInputEl, spanCheckboxEl);
+    divTodoContentEl.append(spanTodoDatetimeEl, spanTodoTitleEl);
+    divEl.append(labelEl, divTodoContentEl, buttonRestoreBtnEl);
+  }
+
+  // labelEl.append(checkboxInputEl, spanCheckboxEl);
+  // divTodoContentEl.append(spanTodoDatetimeEl, spanTodoTitleEl);
+  // divEl.append(labelEl, divTodoContentEl, buttonEditBtnEl, buttonDeleteBtnEl);
+
+  return divEl;
 };
 
-// Рендер списка задач
+// Рендер (добавление в слой div #todos-list) элемент созданный для каждой задачи
 const renderTodos = () => {
-  const filter =
-    document.querySelector('input[name="filter"]:checked')?.id || "all";
-  const searchStr = todosSearchEl.value.trim().toLowerCase();
+  const filteredTodos = applyFilters();
+  const todosQty = filteredTodos.length;
+  const wordFind = pluralize(todosQty, "Найдена", "Найдено", "Найдено");
+  const wordTask = pluralize(todosQty, "задача", "задачи", "задач");
 
-  let todosList = todos;
-  todosList = filterByStatus(todosList, filter);
-  todosList = filterByString(todosList, searchStr);
-  todosList = sortTodos(todosList);
+  // Очищаем все в div #todos-list (все отрендеренные ранее задачи) и пишем туда html со строкой:
+  // "Найдено n задач"
+  todosListEl.innerHTML = `<span>${wordFind} ${todosQty} ${wordTask}</span>`;
 
-  todosListEl.innerHTML = "";
-  todosList.forEach((todo) => todosListEl.appendChild(createTodoElement(todo)));
+  // Добавляем после строки выше в цикле элемент html который создаем createTodoElement
+  // для каждой задачи (слой div .todo и всем содержимым)
+  filteredTodos.forEach((todo) =>
+    todosListEl.appendChild(createTodoElement(todo))
+  );
 };
 
 /* ===== События ===== */
 
-todosFilterEl.addEventListener("change", renderTodos);
+// Обработчик события выбора статуса выполнения
+// todosFilterEl.addEventListener("change", renderTodos);
+todosFilterEls.forEach((filter) =>
+  filter.addEventListener("change", renderTodos)
+);
+
+// Обработчик события ввода в строку поиска
 todosSearchEl.addEventListener("input", renderTodos);
 
+// Обработчики событий кнопок очистки введенной строки на всех input (text)
 cleanInputBtns.forEach((button) =>
   button.addEventListener("click", (event) => {
     event.currentTarget.parentElement.querySelector("input").value = "";
@@ -210,7 +304,7 @@ cleanInputBtns.forEach((button) =>
   })
 );
 
-// Слушатель кнопки открытия диалога добавления задачи
+// Обработчик события нажатия кнопки открытия диалога добавления задачи
 addTodoBtn.addEventListener("click", () => {
   currentEditingId = null;
 
@@ -310,6 +404,11 @@ todosListEl.addEventListener("click", (event) => {
 
   if (event.target.closest(".delete-btn")) {
     deleteTodo(id);
+    renderTodos();
+  }
+
+  if (event.target.closest(".restore-btn")) {
+    restoreTodo(id);
     renderTodos();
   }
 });

@@ -32,7 +32,7 @@ const mockTodosData = [
 // Тестовые данные при первом запуске (при пустом localStorage)
 mockTrashData = [
   {
-    id: "c3958f89",
+    id: "a3e48f31",
     title: "Купить батарейки",
     completed: true,
     date: 1763996400000,

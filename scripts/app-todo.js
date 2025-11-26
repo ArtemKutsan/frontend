@@ -58,10 +58,12 @@ const todoDialogEl = document.querySelector("#todo-dialog");
 const todoDialogActionBtn = document.querySelector("#todo-dialog-action-btn");
 const cancelBtn = document.querySelector("#cancel-btn");
 
-// Определяем текущую дату
-now = new Date(); // Объявлена в timer.js (переделать на модуль???)
-const weekday = now.toLocaleString("ru-RU", { weekday: "long" });
-const date = now.toLocaleString("ru-RU", { day: "numeric", month: "long" });
+// Определяем текущий день недели и дату
+const weekday = new Date().toLocaleString("ru-RU", { weekday: "long" });
+const date = new Date().toLocaleString("ru-RU", {
+  day: "numeric",
+  month: "long",
+});
 
 // Отображаем текущую дату в заголовке приложения
 document.querySelector(".current-weekday").textContent =
@@ -169,8 +171,11 @@ const deleteTodo = (id) => {
   todos = remaining;
   setData(todosKey, todos);
 
+  // Ставим у удаленного элемента deleted = true
   removed.deleted = true;
-  trash.push(removed);
+  // Вставляем удаленный элемент в начало массива корзины чтобы в истории удаления сначала были новые
+  trash.unshift(removed);
+
   setData(trashKey, trash);
 };
 
@@ -207,7 +212,8 @@ const applyFilters = () => {
 
   let todosList = filterByStatus(todos, filter);
   todosList = filterByString(todosList, searchStr);
-  todosList = sortTodos(todosList);
+  // Не сортируем корзину а выводим ее массив в порядке удаления
+  todosList = filter !== "deleted" ? sortTodos(todosList) : todosList;
 
   return todosList;
 };

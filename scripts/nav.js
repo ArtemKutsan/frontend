@@ -37,7 +37,7 @@ const generateNavItems = () => {
       {
         text: "Homework",
         title: "Go to Homework page",
-        href: "homework-15.html",
+        href: "homework-16.html",
         type: "link",
         class: "mx-1",
         icon: "",
@@ -126,7 +126,7 @@ const generateNavItems = () => {
       {
         text: "Homework",
         title: "Go to Homework page",
-        href: "homework-15.html",
+        href: "homework-16.html",
         type: "link",
         class: "mx-1",
         icon: "",

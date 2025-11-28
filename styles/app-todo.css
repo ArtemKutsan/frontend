@@ -263,16 +263,6 @@ input[type="time"] {
 
 /* ===== Список задач END ===== */
 
-#add-todo-btn {
-  /* position: absolute;
-  bottom: 0;
-  right: 0; */
-  /* z-index: 9999;
-  margin-top: auto;
-  margin-left: auto;
-  bottom: 2rem; */
-}
-
 /* !!! Доработать !!! */
 #trash {
   /* min-width: 3rem;

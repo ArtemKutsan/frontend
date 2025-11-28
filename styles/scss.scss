@@ -1,0 +1,19 @@
+$paragraphColor: red;
+$italicColor: green;
+$linkColor: blue;
+$fontWeight: bold;
+
+main {
+  p {
+    color: $paragraphColor;
+    a {
+      color: $linkColor;
+    }
+    i {
+      color: $italicColor;
+    }
+    b {
+      font-weight: $fontWeight;
+    }
+  }
+}

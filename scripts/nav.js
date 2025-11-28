@@ -37,7 +37,7 @@ const generateNavItems = () => {
       {
         text: "Homework",
         title: "Go to Homework page",
-        href: "homework-16.html",
+        href: "homework-16-1.html",
         type: "link",
         class: "mx-1",
         icon: "",
@@ -126,7 +126,7 @@ const generateNavItems = () => {
       {
         text: "Homework",
         title: "Go to Homework page",
-        href: "homework-16.html",
+        href: "homework-16-1.html",
         type: "link",
         class: "mx-1",
         icon: "",
@@ -155,6 +155,14 @@ const generateNavItems = () => {
             text: "CorpTodoViewer.App",
             title: "Open CorpTodoViewer.App",
             href: "app-corp-todo-viewer.html",
+            type: "link",
+            class: "mx-1 text-sm",
+            icon: "",
+          },
+          {
+            text: "Blog.App",
+            title: "Open Blog.App",
+            href: "blog.html",
             type: "link",
             class: "mx-1 text-sm",
             icon: "",

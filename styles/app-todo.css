@@ -168,17 +168,6 @@ input[type="time"] {
   background: var(--color-lite);
 }
 
-.todo-content {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.todo-datetime {
-  font-size: var(--font-sm);
-  color: var(--color-text-lite);
-}
-
 .todo:has(input:checked) {
   background: var(--color-bg-lite);
 }
@@ -213,6 +202,51 @@ input[type="time"] {
 .todo:has(input:checked) .delete-btn {
   display: block;
 }
+
+.todo-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.planned {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.planned .badge {
+  border-radius: 0.5rem;
+  font-size: var(--font-sm);
+  width: fit-content;
+  padding: 0 0.5rem;
+  background: var(--color-text);
+  color: var(--color-text-inverse);
+}
+
+/* .planned .badge-current {
+  background-color: #60708f;
+}
+
+.planned .badge-soon {
+  background-color: #8090ac;
+}
+
+.planned .badge-today {
+  background-color: #a9bfd8;
+}
+
+.planned .badge-tomorrow {
+  background-color: #bfdcd1; 
+}
+
+.planned .badge-later {
+  background-color: #e4e4e4;
+}
+
+.planned .badge-expired {
+  background-color: #c88e7a;
+} */
 
 .todo .edit-btn {
   margin-left: auto;
@@ -300,6 +334,13 @@ input[type="time"] {
     transform: translateY(0);
     max-width: none;
     box-shadow: 0 -0.75rem 1.5rem rgba(0, 0, 0, 0.225);
+  }
+
+  .planned {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: 0.25rem;
   }
 }
 

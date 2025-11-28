@@ -173,24 +173,24 @@ const todoUrl = `${BASE_URL}/todos/1`;
 //   }
 // }
 
-// // Вызов
-// fetchData("https://invalid-url.example");
+// // // Вызов
+// // fetchData("https://invalid-url.example");
 
-const fetchTodos = async () => {
-  try {
-    const response = await fetch("https://dummyjson.com/todos");
-    if (!response.ok) {
-      throw new Error("ошибка при получении задач");
-    }
-    const data = await response.json();
-    const { todos } = data;
-    const lastId = todos.reduce(
-      (max, currentValue) => (currentValue.id > max ? currentValue.id : max),
-      0
-    );
-    return todos;
-  } catch (error) {
-    console.log(error);
-    return [];
-  }
-};
+// const fetchTodos = async () => {
+//   try {
+//     const response = await fetch("https://dummyjson.com/todos");
+//     if (!response.ok) {
+//       throw new Error("ошибка при получении задач");
+//     }
+//     const data = await response.json();
+//     const { todos } = data;
+//     const lastId = todos.reduce(
+//       (max, currentValue) => (currentValue.id > max ? currentValue.id : max),
+//       0
+//     );
+//     return todos;
+//   } catch (error) {
+//     console.log(error);
+//     return [];
+//   }
+// };

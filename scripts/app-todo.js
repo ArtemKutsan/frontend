@@ -113,12 +113,27 @@ const filterByString = (list, str) =>
   str ? list.filter((todo) => todo.title.toLowerCase().includes(str)) : list;
 
 // Сортировка: сначала по выполнению, затем по дате
+const plannedOrder = {
+  current: 0,
+  soon: 1,
+  today: 2,
+  tomorrow: 3,
+  later: 4,
+  expired: 5,
+};
+
 const sortTodos = (list) =>
-  list
-    .slice()
-    .sort((a, b) =>
-      a.completed !== b.completed ? a.completed - b.completed : a.date - b.date
-    );
+  list.slice().sort((a, b) => {
+    // 1. Сначала по выполнению (false < true)
+    if (a.completed !== b.completed) return a.completed - b.completed;
+
+    // 2. Активные: сортировка по planned
+    if (!a.completed && a.planned !== b.planned)
+      return plannedOrder[a.planned] - plannedOrder[b.planned];
+
+    // 3. Сортировка по дате внутри категории
+    return a.date - b.date;
+  });
 
 // Добавление задачи
 const addTodo = (title, date) => {
@@ -131,6 +146,7 @@ const addTodo = (title, date) => {
   });
 
   setData(todosKey, todos);
+  schedulePlannedUpdate();
 };
 
 // Изменение задачи
@@ -142,6 +158,7 @@ const editTodo = (id, title, date) => {
   todo.date = date.getTime();
 
   setData(todosKey, todos);
+  schedulePlannedUpdate();
 };
 
 // Пермещение в корзину
@@ -155,6 +172,7 @@ const toggleTodo = (id) => {
   todo.completed = !todo.completed;
 
   setData(todosKey, todos);
+  schedulePlannedUpdate();
 };
 
 // Удаление задачи
@@ -170,6 +188,7 @@ const deleteTodo = (id) => {
 
   todos = remaining;
   setData(todosKey, todos);
+  schedulePlannedUpdate();
 
   // Ставим у удаленного элемента deleted = true
   removed.deleted = true;
@@ -202,6 +221,7 @@ const restoreTodo = (id) => {
 
   todos.push(resoredTodo);
   setData(todosKey, todos);
+  schedulePlannedUpdate();
 };
 
 // Применяем фильтры
@@ -217,6 +237,169 @@ const applyFilters = () => {
 
   return todosList;
 };
+
+/* ===== Планирование статусов задач ===== */
+
+// Вычисление текущего статуса задачи
+function computePlannedStatus(todo, now = Date.now()) {
+  const due = todo.date;
+
+  if (due <= now) return "expired";
+
+  const diff = due - now;
+
+  // Интервалы
+  const CURRENT = 3600_000;
+  const SOON = 7200_000;
+
+  const today = new Date(now);
+  const dueDate = new Date(due);
+
+  const isSameDay =
+    dueDate.getFullYear() === today.getFullYear() &&
+    dueDate.getMonth() === today.getMonth() &&
+    dueDate.getDate() === today.getDate();
+
+  const isTomorrow = (() => {
+    const t = new Date(today);
+    t.setDate(t.getDate() + 1);
+    return (
+      dueDate.getFullYear() === t.getFullYear() &&
+      dueDate.getMonth() === t.getMonth() &&
+      dueDate.getDate() === t.getDate()
+    );
+  })();
+
+  if (diff < CURRENT) return "current";
+  if (diff < SOON) return "soon";
+  if (isSameDay) return "today";
+  if (isTomorrow) return "tomorrow";
+  return "later";
+}
+
+// Обновление статусов всех задач и сохранение
+function updatePlannedStatuses() {
+  const now = Date.now();
+
+  todos.forEach((todo) => {
+    todo.planned = computePlannedStatus(todo, now);
+  });
+
+  setData(todosKey, todos);
+}
+
+// Получение ближайшего (из всех задач) момента изменения статуса
+function getNextChangeTimestamp(todo, now = Date.now()) {
+  const due = todo.date;
+  if (due <= now) return null;
+
+  const CURRENT = 3600_000;
+  const SOON = 7200_000;
+
+  const dueDate = new Date(due);
+  const today = new Date(now);
+
+  const midnightNext = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate() + 1,
+    0,
+    0,
+    0,
+    0
+  ).getTime();
+
+  const timestamps = [];
+
+  // Порог 3h (today -> soon)
+  const soonTS = due - SOON;
+  if (soonTS > now) timestamps.push(soonTS);
+
+  // Порог 1h (soon -> current)
+  const currentTS = due - CURRENT;
+  if (currentTS > now) timestamps.push(currentTS);
+
+  // Дедлайн (current -> expired)
+  timestamps.push(due);
+
+  // Переход на следующий день (later -> tomorrow или tomorrow -> today)
+  if (midnightNext > now) timestamps.push(midnightNext);
+
+  const future = timestamps.filter((ts) => ts > now);
+  return future.length ? Math.min(...future) : null;
+}
+
+// Поиск ближайшего времени изменения (временной метки) среди всех задач
+function getClosestChange(todosList) {
+  const now = Date.now();
+  let closest = null;
+
+  for (const todo of todosList) {
+    const timestamp = getNextChangeTimestamp(todo, now);
+    if (timestamp == null) continue;
+    if (closest == null || timestamp < closest) closest = timestamp;
+  }
+
+  return closest;
+}
+
+let plannedTimer = null;
+
+// Планирование обновления статусов и рендера
+function schedulePlannedUpdate() {
+  if (plannedTimer) {
+    clearTimeout(plannedTimer);
+    plannedTimer = null;
+  }
+
+  updatePlannedStatuses();
+  renderTodos();
+
+  const closest = getClosestChange(todos);
+  if (!closest) return;
+
+  let delay = closest - Date.now();
+  const LIMIT = 2147483647;
+  if (delay > LIMIT) delay = LIMIT;
+
+  if (delay <= 0) return schedulePlannedUpdate();
+
+  plannedTimer = setTimeout(() => {
+    plannedTimer = null;
+    schedulePlannedUpdate();
+  }, delay);
+}
+
+/* ===== Резервное обновление для фоновых вкладок ===== */
+let hiddenFallbackInterval = null;
+
+function startHiddenFallback() {
+  if (hiddenFallbackInterval) return;
+  hiddenFallbackInterval = setInterval(() => {
+    updatePlannedStatuses();
+    renderTodos();
+    schedulePlannedUpdate();
+  }, 60000); // каждые 60 секунд
+}
+
+function stopHiddenFallback() {
+  if (!hiddenFallbackInterval) return;
+  clearInterval(hiddenFallbackInterval);
+  hiddenFallbackInterval = null;
+}
+
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    startHiddenFallback();
+  } else {
+    stopHiddenFallback();
+    schedulePlannedUpdate();
+  }
+});
+
+window.addEventListener("focus", () => {
+  schedulePlannedUpdate();
+});
 
 // Создание HTML элемента задачи
 const createTodoElement = (todo) => {
@@ -238,8 +421,26 @@ const createTodoElement = (todo) => {
   const divTodoContentEl = document.createElement("div");
   divTodoContentEl.className = "todo-content";
 
+  const divPlannedEl = document.createElement("div");
+  divPlannedEl.className = "planned";
+
+  const spanPlannedEl = document.createElement("span");
+  spanPlannedEl.className = `badge badge-${todo.planned}`;
+  spanPlannedEl.textContent =
+    todo.planned === "current"
+      ? "Сейчас"
+      : todo.planned === "soon"
+      ? "Скоро"
+      : todo.planned === "today"
+      ? "Сегодня"
+      : todo.planned === "tomorrow"
+      ? "Завтра"
+      : todo.planned === "later"
+      ? "Позже"
+      : "Просрочено";
+
   const spanTodoDatetimeEl = document.createElement("span");
-  spanTodoDatetimeEl.className = "todo-datetime";
+  spanTodoDatetimeEl.className = "todo-datetime text-sm text-lite";
   spanTodoDatetimeEl.textContent = new Date(todo.date).toLocaleString("ru-RU", {
     day: "numeric",
     month: "long",
@@ -251,7 +452,19 @@ const createTodoElement = (todo) => {
   spanTodoTitleEl.className = "todo-title";
   spanTodoTitleEl.textContent = todo.title;
 
-  if (!todo.deleted) {
+  if (todo.deleted) {
+    spanCheckboxEl.classList.add("inactive"); // Делаем chrckbox неактивным
+
+    const buttonRestoreBtnEl = document.createElement("button");
+    buttonRestoreBtnEl.type = "button";
+    buttonRestoreBtnEl.className = "restore-btn btn btn-ghost";
+    buttonRestoreBtnEl.innerHTML = `<span class="text-2xl material-symbols-outlined">restore_from_trash</span>`;
+
+    divPlannedEl.append(spanTodoDatetimeEl);
+    labelEl.append(checkboxInputEl, spanCheckboxEl);
+    divTodoContentEl.append(divPlannedEl, spanTodoTitleEl);
+    divEl.append(labelEl, divTodoContentEl, buttonRestoreBtnEl);
+  } else {
     const buttonEditBtnEl = document.createElement("button");
     buttonEditBtnEl.type = "button";
     buttonEditBtnEl.className = "edit-btn btn btn-ghost";
@@ -262,20 +475,12 @@ const createTodoElement = (todo) => {
     buttonDeleteBtnEl.className = "delete-btn btn btn-ghost";
     buttonDeleteBtnEl.innerHTML = `<span class="text-2xl material-symbols-outlined">delete</span>`;
 
+    if (!todo.completed) divPlannedEl.append(spanPlannedEl, spanTodoDatetimeEl);
+    else divPlannedEl.append(spanTodoDatetimeEl);
+
     labelEl.append(checkboxInputEl, spanCheckboxEl);
-    divTodoContentEl.append(spanTodoDatetimeEl, spanTodoTitleEl);
+    divTodoContentEl.append(divPlannedEl, spanTodoTitleEl);
     divEl.append(labelEl, divTodoContentEl, buttonEditBtnEl, buttonDeleteBtnEl);
-  } else {
-    spanCheckboxEl.classList.add("inactive"); // Делаем chrckbox неактивным
-
-    const buttonRestoreBtnEl = document.createElement("button");
-    buttonRestoreBtnEl.type = "button";
-    buttonRestoreBtnEl.className = "restore-btn btn btn-ghost";
-    buttonRestoreBtnEl.innerHTML = `<span class="text-2xl material-symbols-outlined">restore_from_trash</span>`;
-
-    labelEl.append(checkboxInputEl, spanCheckboxEl);
-    divTodoContentEl.append(spanTodoDatetimeEl, spanTodoTitleEl);
-    divEl.append(labelEl, divTodoContentEl, buttonRestoreBtnEl);
   }
 
   // labelEl.append(checkboxInputEl, spanCheckboxEl);
@@ -433,3 +638,4 @@ todosListEl.addEventListener("click", (event) => {
 
 // Первоначальный рендер списка задач
 renderTodos();
+schedulePlannedUpdate();

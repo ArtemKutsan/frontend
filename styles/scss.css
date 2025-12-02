@@ -1,0 +1,12 @@
+main p {
+  color: red;
+}
+main p a {
+  color: blue;
+}
+main p i {
+  color: green;
+}
+main p b {
+  font-weight: bold;
+}/*# sourceMappingURL=scss.css.map */
